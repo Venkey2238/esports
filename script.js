@@ -1,14 +1,11 @@
-// Admin password (In production, this should be in environment variables)
-// For Netlify deployment, we'll use Netlify Functions for real authentication
-const ADMIN_PASSWORD = "RODY2024@AmongUs"; // Temporary password for demo
-
 // Tournament data structure
 let tournamentData = {
     players: [],
-    adminLoggedIn: false
+    adminLoggedIn: false,
+    adminToken: null
 };
 
-// DOM Elements
+// DOM Elements (same as before)
 const adminModal = document.getElementById('adminModal');
 const adminLoginBtn = document.getElementById('adminLoginBtn');
 const closeModal = document.querySelector('.close');
@@ -31,7 +28,10 @@ const successMessage = document.getElementById('successMessage');
 function initTournamentData() {
     const savedData = localStorage.getItem('amongUsTournament');
     if (savedData) {
-        tournamentData = JSON.parse(savedData);
+        const parsedData = JSON.parse(savedData);
+        tournamentData.players = parsedData.players || [];
+        tournamentData.adminLoggedIn = parsedData.adminLoggedIn || false;
+        tournamentData.adminToken = parsedData.adminToken || null;
     } else {
         // Default tournament data
         tournamentData = {
@@ -45,7 +45,8 @@ function initTournamentData() {
                 { name: "Player 7", rounds: [0, 0, 0, 0, 0, 0, 0, 0] },
                 { name: "Player 8", rounds: [0, 0, 0, 0, 0, 0, 0, 0] }
             ],
-            adminLoggedIn: false
+            adminLoggedIn: false,
+            adminToken: null
         };
         saveData();
     }
@@ -57,14 +58,17 @@ function initTournamentData() {
 
 // Save data to localStorage
 function saveData() {
-    localStorage.setItem('amongUsTournament', JSON.stringify(tournamentData));
+    localStorage.setItem('amongUsTournament', JSON.stringify({
+        players: tournamentData.players,
+        adminLoggedIn: tournamentData.adminLoggedIn,
+        adminToken: tournamentData.adminToken
+    }));
 }
 
-// Update points table
+// Update points table (same as before)
 function updateTable() {
     tableBody.innerHTML = '';
     
-    // Sort players by total points (descending)
     const sortedPlayers = [...tournamentData.players].sort((a, b) => {
         const totalA = a.rounds.reduce((sum, val) => sum + (parseInt(val) || 0), 0);
         const totalB = b.rounds.reduce((sum, val) => sum + (parseInt(val) || 0), 0);
@@ -108,7 +112,6 @@ function updateTable() {
         tableBody.appendChild(row);
     });
     
-    // Add event listeners for editable fields
     if (tournamentData.adminLoggedIn) {
         addEditListeners();
     }
@@ -140,7 +143,6 @@ function updateAdminUI() {
 
 // Add event listeners for editable fields
 function addEditListeners() {
-    // Player name inputs
     document.querySelectorAll('.player-name-input').forEach(input => {
         input.addEventListener('change', function() {
             const index = this.dataset.index;
@@ -152,7 +154,6 @@ function addEditListeners() {
         });
     });
     
-    // Points inputs
     document.querySelectorAll('.points-input').forEach(input => {
         input.addEventListener('change', function() {
             const playerIndex = this.dataset.player;
@@ -164,7 +165,6 @@ function addEditListeners() {
         });
     });
     
-    // Delete player buttons
     document.querySelectorAll('.delete-player').forEach(button => {
         button.addEventListener('click', function() {
             const index = this.dataset.index;
@@ -185,11 +185,47 @@ function showSuccess(message) {
     successModal.style.display = 'block';
 }
 
+// Authentication with Netlify Function
+async function authenticateAdmin(password) {
+    try {
+        const response = await fetch('/.netlify/functions/admin-auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Store token for session
+            tournamentData.adminToken = data.token;
+            return { success: true };
+        } else {
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        console.error('Auth error:', error);
+        // Fallback for development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Local development - use hardcoded password
+            const DEV_PASSWORD = "rodyamongus123";
+            if (password === DEV_PASSWORD) {
+                tournamentData.adminToken = 'dev-token-' + Date.now();
+                return { success: true };
+            }
+        }
+        return { success: false, error: 'Network error. Please try again.' };
+    }
+}
+
 // Event Listeners
 adminLoginBtn.addEventListener('click', function() {
     if (tournamentData.adminLoggedIn) {
         // Logout
         tournamentData.adminLoggedIn = false;
+        tournamentData.adminToken = null;
         saveData();
         updateAdminUI();
         updateTable();
@@ -209,11 +245,26 @@ closeSuccess.addEventListener('click', () => {
     successModal.style.display = 'none';
 });
 
-loginBtn.addEventListener('click', () => {
+loginBtn.addEventListener('click', async () => {
     const password = document.getElementById('adminPassword').value;
+    loginError.textContent = '';
     
-    // In production, this would be an API call to Netlify Function
-    if (password === ADMIN_PASSWORD) {
+    if (!password) {
+        loginError.textContent = 'Please enter a password';
+        return;
+    }
+    
+    // Show loading state
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+    loginBtn.disabled = true;
+    
+    const authResult = await authenticateAdmin(password);
+    
+    // Reset button state
+    loginBtn.innerHTML = 'Login';
+    loginBtn.disabled = false;
+    
+    if (authResult.success) {
         tournamentData.adminLoggedIn = true;
         saveData();
         adminModal.style.display = 'none';
@@ -223,7 +274,7 @@ loginBtn.addEventListener('click', () => {
         document.getElementById('adminPassword').value = '';
         loginError.textContent = '';
     } else {
-        loginError.textContent = 'Invalid password! Contact RODY for admin access.';
+        loginError.textContent = authResult.error || 'Invalid password! Contact RODY for admin access.';
     }
 });
 
