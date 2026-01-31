@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us Shapeshift Tournament | Premium Esports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="tournament-brand">
+                <div class="logo">
+                    <i class="fas fa-user-astronaut"></i>
+                    <span>SHAPESHIFT</span>
+                </div>
+                <h1 class="title">AMONG US TOURNAMENT</h1>
+                <div class="organizer">
+                    <span>Organized by</span>
+                    <h2><i class="fas fa-crown"></i> RODY</h2>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#" class="nav-link active"><i class="fas fa-home"></i> Tournament</a>
+                <a href="#" class="nav-link"><i class="fas fa-gamepad"></i> Games</a>
+                <a href="#" class="nav-link"><i class="fas fa-trophy"></i> Esports</a>
+                <a href="#" class="nav-link"><i class="fas fa-users"></i> Community</a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Rules Section -->
+            <section class="rules-section card">
+                <h2><i class="fas fa-scroll"></i> Tournament Rules</h2>
+                <div class="rules-grid">
+                    <div class="rule-item">
+                        <div class="rule-icon"><i class="fas fa-user-secret"></i></div>
+                        <h3>Rule 1: Shapeshift Kill Restriction</h3>
+                        <p>When an Impostor takes a specific player's shapeshift, they can only kill that player.</p>
+                        <p class="example">Example: If Impostor shapeshifts as RODY, only RODY can be killed.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon"><i class="fas fa-ban"></i></div>
+                        <h3>Rule 2: No Other Kills During Shapeshift</h3>
+                        <p>While shapeshifted, killing any other player is NOT allowed.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon"><i class="fas fa-skull-crossbones"></i></div>
+                        <h3>No Body Reports</h3>
+                        <p>No body can be reported until the Impostor kills the player they shapeshifted as.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon"><i class="fas fa-hand-paper"></i></div>
+                        <h3>Wrong Kill = Elimination</h3>
+                        <p>Wrong kill results in immediate Impostor elimination from the match.</p>
+                    </div>
+                </div>
+                
+                <div class="tournament-info">
+                    <h3><i class="fas fa-info-circle"></i> Tournament Format</h3>
+                    <ul>
+                        <li><strong>8 Players</strong> (1 Impostor + 7 Crewmates)</li>
+                        <li><strong>8 Rounds</strong> - Each player becomes Impostor once</li>
+                        <li><strong>Point System</strong> as detailed below</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Point System -->
+            <section class="points-section card">
+                <h2><i class="fas fa-star"></i> Point System</h2>
+                <div class="points-grid">
+                    <div class="points-card impostor">
+                        <h3><i class="fas fa-user-secret"></i> Impostor Points</h3>
+                        <ul>
+                            <li><span class="point-value">+2</span> Each correct kill</li>
+                            <li><span class="point-value">+4</span> Bonus for winning round (eliminate all)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="points-card crewmate">
+                        <h3><i class="fas fa-user-astronaut"></i> Crewmate Points</h3>
+                        <ul>
+                            <li><span class="point-value">+3</span> Each surviving crewmate</li>
+                            <li>Survival requires: Complete tasks OR catch Impostor's wrong kill</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Points Table (Protected) -->
+            <section class="leaderboard-section card">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Tournament Leaderboard</h2>
+                    <button id="adminLoginBtn" class="btn-admin">
+                        <i class="fas fa-lock"></i> Admin Login
+                    </button>
+                </div>
+                
+                <!-- Admin Login Modal -->
+                <div id="adminModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3><i class="fas fa-user-shield"></i> Admin Access</h3>
+                        <div class="login-form">
+                            <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+                            <button id="loginBtn" class="btn-login">Login</button>
+                            <p class="error-message" id="loginError"></p>
+                            <div class="instructions">
+                                <p><strong>Note:</strong> Contact RODY for admin password</p>
+                                <p>After login, you can edit player names and points</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Admin Controls (Hidden by default) -->
+                <div id="adminControls" class="admin-controls">
+                    <h3><i class="fas fa-cog"></i> Admin Controls</h3>
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label>Add Player</label>
+                            <div class="input-group">
+                                <input type="text" id="newPlayerName" placeholder="Player Name">
+                                <button id="addPlayerBtn" class="btn-small"><i class="fas fa-plus"></i> Add</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>Reset All Data</label>
+                            <button id="resetBtn" class="btn-small danger"><i class="fas fa-trash"></i> Reset</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Points Table -->
+                <div class="table-container">
+                    <table id="pointsTable">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player Name</th>
+                                <th>R1</th>
+                                <th>R2</th>
+                                <th>R3</th>
+                                <th>R4</th>
+                                <th>R5</th>
+                                <th>R6</th>
+                                <th>R7</th>
+                                <th>R8</th>
+                                <th>Total</th>
+                                <th class="admin-only">Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dynamic content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Player Points Calculator -->
+                <div class="calculator-section">
+                    <h3><i class="fas fa-calculator"></i> Player Points Calculator</h3>
+                    <div class="calculator">
+                        <select id="playerSelect">
+                            <option value="">Select Player</option>
+                        </select>
+                        <button id="calculateBtn" class="btn-calculate">
+                            <i class="fas fa-calculator"></i> Calculate Total
+                        </button>
+                        <div id="result" class="calculation-result"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <p>© 2024 Among Us Shapeshift Tournament | Organized by <strong>RODY</strong></p>
+                <p class="footer-note">Premium Esports Event | All rights reserved</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal success-modal">
+        <div class="modal-content">
+            <span class="close-success">&times;</span>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Success!</h3>
+            <p id="successMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
