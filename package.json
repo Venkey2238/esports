@@ -1,0 +1,11 @@
+{
+  "name": "among-us-tournament",
+  "version": "1.0.0",
+  "description": "Among Us Tournament System",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
